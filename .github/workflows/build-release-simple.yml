@@ -57,6 +57,7 @@ jobs:
         npm run dist:${{ matrix.platform == 'win32' && 'win' || matrix.platform == 'darwin' && 'mac' || 'linux' }}
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        CSC_IDENTITY_AUTO_DISCOVERY: false
         
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
