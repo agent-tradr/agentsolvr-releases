@@ -94,26 +94,17 @@
       "!electron/cache/**/*",
       "!electron/logs/**/*"
     ],
-    "extraResources": [
-      {
-        "from": "backend/",
-        "to": "backend/",
-        "filter": ["!**/*.pyc", "!**/__pycache__/**/*"]
-      }
-    ],
     "mac": {
       "category": "public.app-category.developer-tools",
-      "hardenedRuntime": true,
+      "hardenedRuntime": false,
       "gatekeeperAssess": false,
-      "entitlements": "assets/entitlements.mac.plist",
-      "entitlementsInherit": "assets/entitlements.mac.plist",
       "target": [
         {
           "target": "dmg",
           "arch": ["x64", "arm64"]
         }
       ],
-      "icon": "assets/icon.icns"
+      "icon": "assets/icon.png"
     },
     "win": {
       "target": [
@@ -122,7 +113,8 @@
           "arch": ["x64"]
         }
       ],
-      "publisherName": "AgentSOLVR Inc"
+      "publisherName": "AgentSOLVR Inc",
+      "icon": "assets/icon.png"
     },
     "linux": {
       "category": "Development",
