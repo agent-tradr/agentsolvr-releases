@@ -149,8 +149,23 @@ function createMainWindow() {
     mainWindow.loadURL('http://localhost:3000');
     mainWindow.webContents.openDevTools();
   } else {
-    // Production: load from built files
-    mainWindow.loadFile(path.join(__dirname, '../frontend/build/index.html'));
+    // Production: load from built files - try both dist and build directories
+    const frontendPath = path.join(__dirname, '../frontend/dist/index.html');
+    const frontendPathAlt = path.join(__dirname, '../frontend/build/index.html');
+    
+    try {
+      if (require('fs').existsSync(frontendPath)) {
+        mainWindow.loadFile(frontendPath);
+      } else if (require('fs').existsSync(frontendPathAlt)) {
+        mainWindow.loadFile(frontendPathAlt);
+      } else {
+        console.error('Frontend build not found');
+        mainWindow.loadURL('data:text/html,<h1>AgentSOLVR</h1><p>Frontend build not found</p>');
+      }
+    } catch (error) {
+      console.error('Error loading frontend:', error);
+      mainWindow.loadURL('data:text/html,<h1>AgentSOLVR</h1><p>Error loading frontend</p>');
+    }
   }
 
   // Show window when ready
@@ -417,9 +432,10 @@ function setupIPC() {
   // Handle backend status requests
   ipcMain.handle('get-backend-status', async () => {
     return {
-      running: backendProcess !== null,
+      running: false, // Frontend-only mode
       port: APP_CONFIG.backend.port,
-      host: APP_CONFIG.backend.host
+      host: APP_CONFIG.backend.host,
+      mode: 'frontend-only'
     };
   });
 
@@ -478,8 +494,8 @@ app.whenReady().then(async () => {
   setupIPC();
   createTray();
   
-  // Start backend service
-  await startBackend();
+  // Skip backend service for now - frontend only mode
+  console.log('Running in frontend-only mode');
   
   // Create main window
   createMainWindow();
