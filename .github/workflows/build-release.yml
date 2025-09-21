@@ -1,0 +1,94 @@
+# AgentSOLVR Electron Build & Release
+# Automatically builds Windows, macOS, and Linux versions on release creation
+name: Build & Release
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch: # Allow manual trigger for testing
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win32
+            arch: x64
+            npm_config_cache: ~/.npm
+            artifact_name: windows
+            
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            npm_config_cache: ~/.npm
+            artifact_name: linux
+            
+          - os: macos-latest
+            platform: darwin
+            arch: x64
+            npm_config_cache: ~/.npm
+            artifact_name: macos
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        repository: agent-tradr/agenttradr
+        token: ${{ secrets.REPO_ACCESS_TOKEN }}
+        path: source
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: source/agentcodr-v4/package.json
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        cd source/agentcodr-v4
+        npm install --ignore-scripts
+        
+    - name: Build frontend
+      run: |
+        cd source/agentcodr-v4/frontend
+        npm install
+        npm run build
+        
+    - name: Build Electron app
+      run: |
+        cd source/agentcodr-v4
+        npm run dist:${{ matrix.platform == 'win32' && 'win' || matrix.platform == 'darwin' && 'mac' || 'linux' }}
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.artifact_name }}-build
+        path: |
+          source/agentcodr-v4/dist/*.exe
+          source/agentcodr-v4/dist/*.dmg
+          source/agentcodr-v4/dist/*.AppImage
+          source/agentcodr-v4/dist/*.deb
+          source/agentcodr-v4/dist/*.rpm
+        if-no-files-found: warn
+        
+    - name: Upload to release (if release event)
+      if: github.event_name == 'release'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          source/agentcodr-v4/dist/*.exe
+          source/agentcodr-v4/dist/*.dmg
+          source/agentcodr-v4/dist/*.AppImage
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
