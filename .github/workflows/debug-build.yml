@@ -1,0 +1,77 @@
+# Debug Build - Get detailed error info
+name: Debug Build
+
+on:
+  workflow_dispatch: # Manual trigger only
+
+jobs:
+  debug-macos:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Check system info
+      run: |
+        echo "=== System Info ==="
+        uname -a
+        node --version
+        npm --version
+        echo "=== Available disk space ==="
+        df -h
+        echo "=== Directory contents ==="
+        ls -la
+        
+    - name: Check agentcodr-v4 directory
+      run: |
+        echo "=== AgentCODR directory ==="
+        ls -la agentcodr-v4/
+        echo "=== Package.json exists? ==="
+        cat agentcodr-v4/package.json | head -20
+        
+    - name: Install dependencies (verbose)
+      run: |
+        cd agentcodr-v4
+        echo "=== Installing dependencies ==="
+        npm install --ignore-scripts --verbose
+        
+    - name: Check frontend directory
+      run: |
+        cd agentcodr-v4
+        echo "=== Frontend directory ==="
+        ls -la frontend/
+        echo "=== Frontend package.json ==="
+        cat frontend/package.json | head -20
+        
+    - name: Install frontend dependencies (verbose)
+      run: |
+        cd agentcodr-v4/frontend
+        echo "=== Installing frontend dependencies ==="
+        npm install --verbose
+        
+    - name: Build frontend (verbose)
+      run: |
+        cd agentcodr-v4/frontend
+        echo "=== Building frontend ==="
+        npm run build --verbose
+        
+    - name: Check dist scripts
+      run: |
+        cd agentcodr-v4
+        echo "=== Available npm scripts ==="
+        npm run
+        echo "=== Checking for dist:mac script ==="
+        grep -A 5 -B 5 "dist:mac" package.json || echo "dist:mac not found"
+        
+    - name: Try Electron build (verbose)
+      run: |
+        cd agentcodr-v4
+        echo "=== Attempting Electron build ==="
+        npm run dist:mac --verbose
+      continue-on-error: true
