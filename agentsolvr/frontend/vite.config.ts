@@ -41,6 +41,7 @@ export default defineConfig({
       },
     },
   },
+  base: './', // Use relative paths for Electron
   define: {
     'process.env': {},
   },
