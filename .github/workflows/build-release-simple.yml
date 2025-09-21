@@ -71,13 +71,3 @@ jobs:
           agentcodr-v4/dist/*.rpm
         if-no-files-found: warn
         
-    - name: Upload to release (if release event)
-      if: github.event_name == 'release'
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          agentcodr-v4/dist/*.exe
-          agentcodr-v4/dist/*.dmg
-          agentcodr-v4/dist/*.AppImage
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
