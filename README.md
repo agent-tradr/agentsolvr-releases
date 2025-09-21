@@ -188,4 +188,4 @@ AgentSOLVR is built with enterprise-grade security:
 <p align="center">
   <strong>AgentSOLVR - Turn Any Idea Into Working Software</strong><br>
   © 2025 AgentSOLVR. All rights reserved.
-</p>
+</p># Workflow Detection
