@@ -28,22 +28,22 @@ jobs:
         echo "=== Directory contents ==="
         ls -la
         
-    - name: Check agentcodr-v4 directory
+    - name: Check agentsolvr directory
       run: |
-        echo "=== AgentCODR directory ==="
-        ls -la agentcodr-v4/
+        echo "=== AgentSOLVR directory ==="
+        ls -la agentsolvr/
         echo "=== Package.json exists? ==="
-        cat agentcodr-v4/package.json | head -20
+        cat agentsolvr/package.json | head -20
         
     - name: Install dependencies (verbose)
       run: |
-        cd agentcodr-v4
+        cd agentsolvr
         echo "=== Installing dependencies ==="
         npm install --ignore-scripts --verbose
         
     - name: Check frontend directory
       run: |
-        cd agentcodr-v4
+        cd agentsolvr
         echo "=== Frontend directory ==="
         ls -la frontend/
         echo "=== Frontend package.json ==="
@@ -51,19 +51,19 @@ jobs:
         
     - name: Install frontend dependencies (verbose)
       run: |
-        cd agentcodr-v4/frontend
+        cd agentsolvr/frontend
         echo "=== Installing frontend dependencies ==="
         npm install --verbose
         
     - name: Build frontend (verbose)
       run: |
-        cd agentcodr-v4/frontend
+        cd agentsolvr/frontend
         echo "=== Building frontend ==="
         npm run build --verbose
         
     - name: Check dist scripts
       run: |
-        cd agentcodr-v4
+        cd agentsolvr
         echo "=== Available npm scripts ==="
         npm run
         echo "=== Checking for dist:mac script ==="
@@ -71,7 +71,7 @@ jobs:
         
     - name: Try Electron build (verbose)
       run: |
-        cd agentcodr-v4
+        cd agentsolvr
         echo "=== Attempting Electron build ==="
         npm run dist:mac --verbose
       continue-on-error: true

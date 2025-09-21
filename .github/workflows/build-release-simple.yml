@@ -38,22 +38,22 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
-        cache-dependency-path: agentcodr-v4/package.json
+        cache-dependency-path: agentsolvr/package.json
         
     - name: Install dependencies
       run: |
-        cd agentcodr-v4
+        cd agentsolvr
         npm install --ignore-scripts
         
     - name: Build frontend
       run: |
-        cd agentcodr-v4/frontend
+        cd agentsolvr/frontend
         npm install
         npm run build
         
     - name: Build Electron app
       run: |
-        cd agentcodr-v4
+        cd agentsolvr
         npm run dist:${{ matrix.platform == 'win32' && 'win' || matrix.platform == 'darwin' && 'mac' || 'linux' }}
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -64,10 +64,10 @@ jobs:
       with:
         name: ${{ matrix.artifact_name }}-build
         path: |
-          agentcodr-v4/dist/*.exe
-          agentcodr-v4/dist/*.dmg
-          agentcodr-v4/dist/*.AppImage
-          agentcodr-v4/dist/*.deb
-          agentcodr-v4/dist/*.rpm
+          agentsolvr/dist/*.exe
+          agentsolvr/dist/*.dmg
+          agentsolvr/dist/*.AppImage
+          agentsolvr/dist/*.deb
+          agentsolvr/dist/*.rpm
         if-no-files-found: warn
         
