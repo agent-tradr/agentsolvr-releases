@@ -1,0 +1,194 @@
+{
+  "name": "agentsolvr",
+  "version": "1.0.0",
+  "description": "AgentSOLVR - Voice-controlled AI development platform",
+  "main": "electron/main.js",
+  "homepage": "./",
+  "private": true,
+  "author": {
+    "name": "AgentSOLVR Team",
+    "email": "team@agentsolvr.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "electron",
+    "react",
+    "typescript",
+    "agents",
+    "coordination",
+    "ai",
+    "development"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agent-tradr/agenttradr.git"
+  },
+  "bugs": {
+    "url": "https://github.com/agent-tradr/agenttradr/issues"
+  },
+  "scripts": {
+    "start": "npm run electron",
+    "dev": "concurrently \"npm run start:frontend\" \"npm run start:backend\" \"wait-on http://localhost:3000 && npm run electron:dev\"",
+    "start:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && python src/main.py",
+    "electron": "electron .",
+    "electron:dev": "cross-env NODE_ENV=development electron .",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && python -m py_compile src/main.py",
+    "test": "npm run test:frontend && npm run test:backend",
+    "test:frontend": "cd frontend && npm test -- --watchAll=false",
+    "test:backend": "cd backend && python -m pytest tests/",
+    "test:e2e": "cd tests && python -m pytest e2e/",
+    "test:comprehensive": "python -m pytest tests/ --cov=backend/src --cov=frontend/src --cov=electron --cov-report=term-missing",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:backend": "cd backend && python -m ruff check src/ --fix && python -m ruff format src/",
+    "type-check": "cd frontend && npm run type-check",
+    "dist": "electron-builder",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win",
+    "dist:linux": "electron-builder --linux",
+    "postinstall": "npm run install:frontend && npm run install:backend",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && pip install -r requirements.txt",
+    "clean": "rimraf build dist node_modules frontend/node_modules backend/__pycache__ tests/__pycache__",
+    "clean:build": "rimraf build dist frontend/build",
+    "format": "npm run format:frontend && npm run format:backend",
+    "format:frontend": "cd frontend && npm run format",
+    "format:backend": "cd backend && python -m ruff format src/",
+    "security-audit": "npm audit && cd frontend && npm audit",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "electron-devtools-installer": "^3.2.0",
+    "electron-is-dev": "^2.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "rimraf": "^5.0.5",
+    "wait-on": "^7.2.0"
+  },
+  "dependencies": {
+    "electron-log": "^5.0.1",
+    "electron-store": "^8.1.0",
+    "electron-updater": "^6.1.7",
+    "electron-window-state": "^5.0.3"
+  },
+  "build": {
+    "appId": "com.agentsolvr.desktop",
+    "productName": "AgentSOLVR",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "electron/**/*",
+      "frontend/build/**/*",
+      "backend/src/**/*",
+      "package.json",
+      "!electron/temp/**/*",
+      "!electron/cache/**/*",
+      "!electron/logs/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "backend/",
+        "to": "backend/",
+        "filter": ["!**/*.pyc", "!**/__pycache__/**/*"]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "assets/entitlements.mac.plist",
+      "entitlementsInherit": "assets/entitlements.mac.plist",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "assets/icon.icns"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "publisherName": "AgentSOLVR Inc"
+    },
+    "linux": {
+      "category": "Development",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        },
+        {
+          "target": "rpm",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "desktop": {
+        "StartupWMClass": "AgentSOLVR"
+      }
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "allowElevation": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "agent-tradr",
+      "repo": "agenttradr"
+    },
+    "compression": "maximum",
+    "electronVersion": "28.0.0"
+  },
+  "lint-staged": {
+    "frontend/src/**/*.{js,jsx,ts,tsx}": [
+      "cd frontend && npm run lint:fix",
+      "cd frontend && npm run format"
+    ],
+    "backend/src/**/*.py": [
+      "cd backend && python -m ruff check --fix",
+      "cd backend && python -m ruff format"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

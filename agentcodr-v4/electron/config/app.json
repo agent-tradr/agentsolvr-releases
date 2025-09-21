@@ -1,0 +1,22 @@
+{
+  "app": {
+    "name": "AgentTradr Local",
+    "version": "1.0.0",
+    "debug": false
+  },
+  "window": {
+    "width": 1200,
+    "height": 800,
+    "resizable": true,
+    "show": true
+  },
+  "server": {
+    "host": "localhost",
+    "port": 8000,
+    "auto_start": true
+  },
+  "database": {
+    "type": "sqlite",
+    "path": "./data/agenttradr.db"
+  }
+}

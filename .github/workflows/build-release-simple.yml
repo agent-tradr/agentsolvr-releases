@@ -1,0 +1,82 @@
+# AgentSOLVR Electron Build & Release - Simplified Version
+# Builds from files in this repository (no private repo access needed)
+name: Build & Release - Simple
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch: # Allow manual trigger for testing
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win32
+            arch: x64
+            artifact_name: windows
+            
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            artifact_name: linux
+            
+          - os: macos-latest
+            platform: darwin
+            arch: x64
+            artifact_name: macos
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: agentcodr-v4/package.json
+        
+    - name: Install dependencies
+      run: |
+        cd agentcodr-v4
+        npm install --ignore-scripts
+        
+    - name: Build frontend
+      run: |
+        cd agentcodr-v4/frontend
+        npm install
+        npm run build
+        
+    - name: Build Electron app
+      run: |
+        cd agentcodr-v4
+        npm run dist:${{ matrix.platform == 'win32' && 'win' || matrix.platform == 'darwin' && 'mac' || 'linux' }}
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact_name }}-build
+        path: |
+          agentcodr-v4/dist/*.exe
+          agentcodr-v4/dist/*.dmg
+          agentcodr-v4/dist/*.AppImage
+          agentcodr-v4/dist/*.deb
+          agentcodr-v4/dist/*.rpm
+        if-no-files-found: warn
+        
+    - name: Upload to release (if release event)
+      if: github.event_name == 'release'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          agentcodr-v4/dist/*.exe
+          agentcodr-v4/dist/*.dmg
+          agentcodr-v4/dist/*.AppImage
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
